@@ -1,8 +1,8 @@
+import { getArtists } from "@/app/data-access/artist";
 import { asyncHandler } from "@/app/utils/asyncHandler";
-import { query } from "@/lib/db";
 import { NextResponse } from "next/server";
 
 export const GET = asyncHandler(async () => {
-  const rows = await query("SELECT * FROM artists", []);
-  return NextResponse.json({ status: 200, body: rows });
+  const rows = await getArtists();
+  return NextResponse.json({ success: true, artists: rows });
 });

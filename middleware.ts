@@ -13,7 +13,7 @@ export async function middleware(req: NextRequest) {
   if (pathname.startsWith("/api")) {
     if (
       PRIVATE_API_ROUTES.some((route) => pathname.startsWith(route)) &&
-      !!currentUser
+      !currentUser
     ) {
       // If not authenticated, return a 401 Unauthorized response
       return new NextResponse("Unauthorized from middleware", {

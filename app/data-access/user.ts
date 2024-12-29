@@ -6,17 +6,26 @@ interface UserWithId extends User {
 }
 
 export const getUserById = async (id: number) => {
-  const rows = await query("SELECT * FROM users WHERE id = $1", [id]);
+  const rows = await query(
+    "SELECT id,first_name,last_name,email,password,role,role,phone,dob,gender,address FROM users WHERE id = $1",
+    [id]
+  );
   return rows[0] as UserWithId;
 };
 
 export const getUserByEmail = async (email: string) => {
-  const rows = await query("SELECT * FROM users WHERE email = $1", [email]);
+  const rows = await query(
+    "SELECT id,first_name,last_name,email,password,role,role,phone,dob,gender,address FROM users WHERE email = $1",
+    [email]
+  );
   return rows[0] as UserWithId;
 };
 
 export const getUsers = async () => {
-  const rows = await query("SELECT * FROM users", []);
+  const rows = await query(
+    "SELECT id,first_name,last_name,email,role,role,phone,dob,gender,address FROM users",
+    []
+  );
   return rows as UserWithId[];
 };
 
@@ -26,16 +35,17 @@ export const createUser = async (user: User) => {
     last_name,
     email,
     password,
+    role,
     phone,
     dob,
     gender,
     address,
   } = user;
   const rows = await query(
-    `INSERT INTO users (first_name, last_name, email, password, phone, dob, gender, address, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+    `INSERT INTO users (first_name, last_name, email, password,role, phone, dob, gender, address, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
          RETURNING *`,
-    [first_name, last_name, email, password, phone, dob, gender, address]
+    [first_name, last_name, email, password, role, phone, dob, gender, address]
   );
   return rows;
 };

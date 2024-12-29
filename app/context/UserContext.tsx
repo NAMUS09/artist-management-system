@@ -5,7 +5,7 @@ import { createContext } from "react";
 import usePersistedState from "../hooks/usePresistedState";
 
 export type UserData = Pick<User, "id" | "email"> & {
-  fullName: string;
+  name: string;
   accessToken: string;
   expires: string;
 };

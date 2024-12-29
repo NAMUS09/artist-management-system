@@ -24,7 +24,7 @@ type Response = {
   accessToken: string;
   expires: string;
   user: Pick<User, "id" | "email"> & {
-    fullName: string;
+    name: string;
   };
 };
 
@@ -57,7 +57,14 @@ const LoginPage = () => {
       form.reset();
       toast.success(res.message);
       const { accessToken, expires, user } = res;
-      setUser({ ...user, accessToken, expires });
+      const userData = {
+        id: user.id!,
+        email: user.email,
+        name: user.name,
+        accessToken,
+        expires,
+      };
+      setUser(userData);
       router.push("/");
     },
     onError: (error) => {

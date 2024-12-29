@@ -10,12 +10,13 @@ import {
 } from "./common";
 
 export const userRegisterSchema = z.object({
+  id: z.number().optional(),
   email: emailSchema,
   password: passwordSchema,
   first_name: z.string().nonempty({ message: "First name is required" }),
   last_name: z.string().nonempty({ message: "Last name is required" }),
   phone: phoneNumberSchema,
-  dob: dobSchema,
+  dob: dobSchema.nullable(),
   gender: genderSchema,
   role: roleSchema,
   address: z.string().nonempty({ message: "Address is required" }),

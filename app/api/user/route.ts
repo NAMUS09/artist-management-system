@@ -1,8 +1,8 @@
+import { getUsers } from "@/app/data-access/user";
 import { asyncHandler } from "@/app/utils/asyncHandler";
-import { query } from "@/lib/db";
 import { NextResponse } from "next/server";
 
 export const GET = asyncHandler(async () => {
-  const rows = await query("SELECT * FROM users", []);
-  return NextResponse.json({ status: 200, body: rows });
+  const rows = await getUsers();
+  return NextResponse.json({ success: true, users: rows });
 });
