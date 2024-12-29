@@ -1,4 +1,4 @@
-import { createUser, updateUser } from "@/app/data-access/user";
+import { createUser, updateUserById } from "@/app/data-access/user";
 import { asyncHandler } from "@/app/utils/asyncHandler";
 import { User } from "@/lib/interface";
 import { NextResponse } from "next/server";
@@ -9,7 +9,7 @@ export const POST = asyncHandler(async (req: Request) => {
 
   if (id) {
     // Update existing user
-    const rows = await updateUser(id, body);
+    const rows = await updateUserById(id, body);
 
     if (rows.length === 0) {
       return NextResponse.json({ status: 404, body: "User not found" });

@@ -1,16 +1,16 @@
 import { asyncHandler } from "@/app/utils/asyncHandler";
 import { query } from "@/lib/db";
-import { Album } from "@/lib/interface";
+import { Music } from "@/lib/interface";
 import { NextResponse } from "next/server";
 
 export const GET = asyncHandler(async (req: Request) => {
-  const body = (await req.json()) as Album;
+  const body = (await req.json()) as Music;
   const { id, artist_id, title, album_name, genre } = body;
 
   if (id) {
     // Update existing album
     const rows = await query(
-      `UPDATE albums
+      `UPDATE musics
          SET artist_id = $1, title = $2, album_name = $3, genre = $4, updated_at = NOW()
          WHERE id = $5
          RETURNING *`,

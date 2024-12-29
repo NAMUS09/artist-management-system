@@ -6,7 +6,7 @@ export const GET = asyncHandler(
   async (req: Request, { params }: { params: Promise<{ id: string }> }) => {
     const { id } = await params;
 
-    const row = await query("SELECT * FROM albums WHERE id = $1", [id]);
+    const row = await query("SELECT * FROM musics WHERE id = $1", [id]);
     return NextResponse.json({ status: 200, body: row });
   }
 );

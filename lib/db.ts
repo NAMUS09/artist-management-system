@@ -7,6 +7,7 @@ const pool = new Pool({
     rejectUnauthorized: false,
   },
 });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const query = async (text: string, params: any) => {
   const client = await pool.connect();
   try {

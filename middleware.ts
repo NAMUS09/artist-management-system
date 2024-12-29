@@ -3,7 +3,7 @@ import { getCurrentUser } from "./lib/auth";
 
 const PUBLIC_ROUTES = ["/login", "/register"];
 
-const PRIVATE_API_ROUTES = ["/api/user", "/api/album", "/api/artist"];
+const PRIVATE_API_ROUTES = ["/api/user", "/api/artist", "/api/music"];
 
 export async function middleware(req: NextRequest) {
   const currentUser = await getCurrentUser();
