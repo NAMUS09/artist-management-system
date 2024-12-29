@@ -4,11 +4,13 @@ import { asyncHandler } from "@/app/utils/asyncHandler";
 import CustomError from "@/app/utils/customError";
 import { generateToken } from "@/app/utils/token";
 import { validateRequestBody } from "@/app/utils/validateBody";
-import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
 import { User } from "@/lib/interface";
+import bcrypt from "bcryptjs";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 export const POST = asyncHandler(async (request: Request) => {
+  const cookieStore = await cookies();
   const body = (await request.json()) as UserLoginSchema;
 
   const [validationError, validatedFields] = validateRequestBody(
@@ -27,41 +29,50 @@ export const POST = asyncHandler(async (request: Request) => {
     throw new CustomError("Invalid credentials.");
   }
 
-  if (!user.emailVerified) {
-    throw new CustomError("Email not verified.");
-  }
-
   const passwordsMatch = await bcrypt.compare(password, user.password);
 
   if (!passwordsMatch) throw new CustomError("Invalid credentials.");
 
+  const fullName = `${user.first_name} ${user.last_name}`;
+
   // safe to generate token
-  const { token, expires } = generateToken({
+  const { token, expires } = await generateToken({
     id: user.id,
-    name: user.name!,
     email: user.email!,
+    name: fullName,
     role: user.role,
   });
 
   // update user token
   const { id, ...rest } = user;
   await updateUserById(id, {
-    rest,
+    ...rest,
     accessToken: token,
     expires,
   } as unknown as User);
+
+  const responseData = {
+    accessToken: token,
+    expires: expires.toISOString(),
+    user: {
+      id: user.id,
+      name: fullName,
+      email: user.email,
+    },
+  };
+
+  cookieStore.set({
+    name: "accessToken",
+    value: token,
+    httpOnly: true,
+    path: "/",
+  });
 
   return NextResponse.json(
     {
       success: true,
       message: "login successful",
-      accessToken: token,
-      expires: expires.toISOString(),
-      user: {
-        id: user.id,
-        name: user.name!,
-        email: user.email,
-      },
+      ...responseData,
     },
     { status: 200 }
   );

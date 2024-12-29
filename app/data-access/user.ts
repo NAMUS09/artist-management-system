@@ -1,19 +1,23 @@
 import { query } from "@/lib/db";
 import { User } from "@/lib/interface";
 
-export const getUserById = async (id: string) => {
+interface UserWithId extends User {
+  id: number;
+}
+
+export const getUserById = async (id: number) => {
   const rows = await query("SELECT * FROM users WHERE id = $1", [id]);
-  return rows[0];
+  return rows[0] as UserWithId;
 };
 
 export const getUserByEmail = async (email: string) => {
   const rows = await query("SELECT * FROM users WHERE email = $1", [email]);
-  return rows[0];
+  return rows[0] as UserWithId;
 };
 
 export const getUsers = async () => {
   const rows = await query("SELECT * FROM users", []);
-  return rows;
+  return rows as UserWithId[];
 };
 
 export const createUser = async (user: User) => {

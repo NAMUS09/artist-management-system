@@ -1,4 +1,4 @@
-import { createAlbum, updateAlbum } from "@/app/data-access/album";
+import { createAlbum, updateAlbum } from "@/app/data-access/music";
 import { asyncHandler } from "@/app/utils/asyncHandler";
 import { Album } from "@/lib/interface";
 import { NextResponse } from "next/server";
