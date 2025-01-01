@@ -1,14 +1,55 @@
 import { Button } from "@/components/ui/button";
-import { ColumnDef } from "@tanstack/react-table";
-import { Pencil, Trash2 } from "lucide-react";
+import { Column, ColumnDef } from "@tanstack/react-table";
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronsUpDown,
+  Pencil,
+  Trash2,
+} from "lucide-react";
+
+export type SortColumnDef<T> = ColumnDef<T> & {
+  sortable?: boolean;
+};
 
 const appendActionColumn = <T,>(
-  columns: ColumnDef<T>[],
+  columns: SortColumnDef<T>[],
   handleEdit: (data: T) => void,
   handleDelete: (data: T) => void
 ): ColumnDef<T>[] => {
+  //add sorting to specified columns
+  const sortingColumns = columns.map((curColumn) => {
+    const { sortable, ...rest } = curColumn;
+    const isSortable = sortable ?? true;
+
+    if (!isSortable) {
+      return rest;
+    }
+    return {
+      ...rest,
+      header: ({ column }: { column: Column<T, unknown> }) => {
+        const { getIsSorted } = column;
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(getIsSorted() === "asc")}
+          >
+            {curColumn.header as string}
+            {column.getIsSorted() === "desc" ? (
+              <ArrowDown />
+            ) : column.getIsSorted() === "asc" ? (
+              <ArrowUp />
+            ) : (
+              <ChevronsUpDown />
+            )}
+          </Button>
+        );
+      },
+    };
+  }) as ColumnDef<T>[]; // Ensure proper typing
+
   return [
-    ...columns,
+    ...sortingColumns,
     {
       id: "actions",
       header: "Actions",

@@ -1,8 +1,11 @@
 import { getArtists } from "@/app/data-access/artist";
-import { asyncHandler } from "@/app/utils/asyncHandler";
+import roleAsyncHandler from "@/app/utils/roleAsyncHandler";
 import { NextResponse } from "next/server";
 
-export const GET = asyncHandler(async () => {
-  const rows = await getArtists();
-  return NextResponse.json({ success: true, artists: rows });
-});
+export const GET = roleAsyncHandler(
+  ["super_admin", "artist_manager"],
+  async () => {
+    const rows = await getArtists();
+    return NextResponse.json({ success: true, artists: rows });
+  }
+);

@@ -1,4 +1,5 @@
 import { exportToCSV } from "@/app/utils/exportCSV";
+import toast from "react-hot-toast";
 import { CiExport } from "react-icons/ci";
 import { Button } from "./ui/button";
 
@@ -11,6 +12,7 @@ const ExportCSVButton = <T extends Record<string, number | string>>({
 }) => {
   const handleExport = () => {
     exportToCSV(data, fileName);
+    toast.success("Exported as CSV");
   };
 
   return (

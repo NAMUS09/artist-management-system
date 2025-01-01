@@ -21,12 +21,34 @@ export const getUserByEmail = async (email: string) => {
   return rows[0] as UserWithId;
 };
 
-export const getUsers = async () => {
+export const getUsers = async (page: number, pageSize: number) => {
+  const offset = (page - 1) * pageSize;
   const rows = await query(
-    "SELECT id,first_name,last_name,email,role,role,phone,dob,gender,address FROM users",
+    `SELECT id, first_name, last_name, email, role, phone, dob, gender, address
+     FROM users
+     ORDER BY id DESC
+     LIMIT $1 OFFSET $2`,
+    [pageSize, offset]
+  );
+  const totalCountResult = await query(
+    `SELECT COUNT(*) as totalcount FROM users`,
     []
   );
-  return rows as UserWithId[];
+
+  const totalCount = +totalCountResult[0]?.totalcount || 0;
+
+  // Calculate total pages
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  return {
+    users: rows as UserWithId[],
+    pagination: {
+      currentPage: page,
+      pageSize,
+      totalPages,
+      totalCount,
+    },
+  };
 };
 
 export const createUser = async (user: User) => {

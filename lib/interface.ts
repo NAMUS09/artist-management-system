@@ -43,6 +43,15 @@ interface BaseResponse {
   message: string;
 }
 
+export interface PaginationResponse {
+  pagination: {
+    currentPage: number;
+    pageSize: number;
+    totalPages: number;
+    totalCount: number;
+  };
+}
+
 interface BaseErrorResponse {
   success: boolean;
   message: string;

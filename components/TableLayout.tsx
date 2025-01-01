@@ -1,8 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Plus } from "lucide-react";
 import ExportCSVButton from "./ExportCSV";
+import ImportCSV from "./ImportCSV";
+import { DataTable } from "./table/data-table";
 import { Button } from "./ui/button";
-import { DataTable } from "./ui/data-table";
 
 type TableLayoutProps<T> = {
   heading: string;
@@ -13,6 +14,8 @@ type TableLayoutProps<T> = {
   handleAdd: () => void;
   fileName?: string;
   children?: React.ReactNode;
+  requiredKeys?: string[];
+  handleImport: (data: { [key: string]: string }[]) => void;
 };
 
 const TableLayout = <T,>({
@@ -24,10 +27,12 @@ const TableLayout = <T,>({
   handleAdd,
   fileName,
   children,
+  requiredKeys,
+  handleImport,
 }: TableLayoutProps<T>) => {
   return (
-    <div className="container mx-auto p-5">
-      <h1 className="text-2xl font-bold mb-5">{heading}</h1>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-2">{heading}</h1>
       {isLoading && <p>Loading...</p>}
       {!isLoading && (
         <>
@@ -37,14 +42,17 @@ const TableLayout = <T,>({
               <Plus />
               {addText}
             </Button>
+            <ImportCSV
+              requiredKeys={requiredKeys ?? []}
+              handleImport={handleImport}
+            />
             <ExportCSVButton
               data={(data as Record<string, number | string>[]) ?? []}
-
               fileName={fileName ?? "export.csv"}
             />
           </div>
 
-          <div className="mt-5">
+          <div className="mt-3">
             <DataTable columns={columns} data={data ?? []} />
           </div>
         </>
