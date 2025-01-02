@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Table } from "@tanstack/react-table";
 import {
   ChevronLeft,
   ChevronRight,
@@ -7,12 +5,7 @@ import {
   ChevronsRight,
 } from "lucide-react";
 
-import {
-  FetchNextPageOptions,
-  InfiniteData,
-  InfiniteQueryObserverResult,
-} from "@tanstack/react-query";
-import { createContext, useContext } from "react";
+import { Table } from "@tanstack/react-table";
 import { Button } from "../ui/button";
 import {
   Select,
@@ -22,41 +15,6 @@ import {
   SelectValue,
 } from "../ui/select";
 
-type PaginationTableContextValue = {
-  setPageSize: React.Dispatch<React.SetStateAction<number>>;
-  fetchNextPage: (
-    options?: FetchNextPageOptions
-  ) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
-  fetchPreviousPage: (
-    options?: FetchNextPageOptions
-  ) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
-  hasNextPage: boolean;
-};
-
-const PaginationTableContext = createContext<PaginationTableContextValue>(
-  {} as PaginationTableContextValue
-);
-
-export type PaginationTableProps = PaginationTableContextValue & {
-  children: React.ReactNode;
-};
-
-export const PaginationTable: React.FC<PaginationTableProps> = ({
-  setPageSize,
-  fetchNextPage,
-  fetchPreviousPage,
-  hasNextPage,
-  children,
-}) => {
-  return (
-    <PaginationTableContext
-      value={{ setPageSize, fetchNextPage, fetchPreviousPage, hasNextPage }}
-    >
-      {children}
-    </PaginationTableContext>
-  );
-};
-
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
 }
@@ -64,17 +22,6 @@ interface DataTablePaginationProps<TData> {
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
-  const paginationContext = useContext(PaginationTableContext);
-
-  if (!paginationContext) {
-    throw new Error(
-      "usePagination must be used within a PaginationTableProvider."
-    );
-  }
-
-  const { setPageSize, fetchNextPage, fetchPreviousPage, hasNextPage } =
-    paginationContext;
-
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
@@ -88,7 +35,6 @@ export function DataTablePagination<TData>({
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
               const pageSize = Number(value);
-              setPageSize(pageSize);
               table.setPageSize(pageSize);
             }}
           >
@@ -106,7 +52,7 @@ export function DataTablePagination<TData>({
         </div>
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
           Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
+          {table.getPageCount().toLocaleString()}
         </div>
         <div className="flex items-center space-x-2">
           <Button
@@ -121,10 +67,7 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            onClick={() => {
-              fetchPreviousPage();
-              table.previousPage();
-            }}
+            onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
             <span className="sr-only">Go to previous page</span>
@@ -143,10 +86,9 @@ export function DataTablePagination<TData>({
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
             onClick={() => {
-              fetchNextPage();
               table.setPageIndex(table.getPageCount() - 1);
             }}
-            disabled={!table.getCanNextPage() || !hasNextPage}
+            disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">Go to last page</span>
             <ChevronsRight />

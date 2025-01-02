@@ -1,17 +1,17 @@
 "use client";
 
 import {
-  CreateMultipleArtist,
-  createMultipleArtistSchema,
-} from "@/app/schemas/artistSchema";
+  CreateMultipleMusic,
+  createMultipleMusicSchema,
+} from "@/app/schemas/musicSchema";
 import appendActionColumn from "@/app/utils/appendActionColumn";
 import axiosClient from "@/axios";
 import { PaginationTable } from "@/components/table/data-table";
 import TableLayout from "@/components/TableLayout";
 import {
-  Artist,
   BaseErrorResponse,
   BaseResponse,
+  Music,
   PaginationResponse,
 } from "@/lib/interface";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -20,44 +20,37 @@ import { AxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-type ArtistsResponse = BaseResponse &
+type MusicsResponse = BaseResponse &
   PaginationResponse & {
-    artists: Artist[];
+    musics: Music[];
   };
 
-const columns: ColumnDef<Artist>[] = [
+const columns: ColumnDef<Music>[] = [
   {
     accessorKey: "id",
     header: "Id",
   },
   {
-    accessorKey: "name",
+    accessorKey: "artist_name",
     header: "Artist name",
   },
   {
-    accessorKey: "gender",
-    header: "Gender",
+    accessorKey: "title",
+    header: "Title",
   },
   {
-    accessorKey: "first_release_year",
-    header: "First release year",
+    accessorKey: "album_name",
+    header: "Album name",
   },
   {
-    accessorKey: "no_of_albums_released",
-    header: "No. of albums released",
+    accessorKey: "genre",
+    header: "Genre",
   },
 ];
 
-const requiredKeys = [
-  "name",
-  "dob",
-  "gender",
-  "address",
-  "first_release_year",
-  "no_of_albums_released",
-];
+const requiredKeys = ["artist_name", "title", "album_name", "genre"];
 
-const ArtistsPage = () => {
+const MusicsPage = () => {
   const queryClient = useQueryClient();
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -65,32 +58,32 @@ const ArtistsPage = () => {
     pageSize: 10,
   });
 
-  const { data, isLoading } = useQuery<ArtistsResponse>({
-    queryKey: ["artists", pagination],
-    queryFn: () => axiosClient.get("/artist").then((res) => res.data),
+  const { data, isLoading } = useQuery<MusicsResponse>({
+    queryKey: ["musics", pagination],
+    queryFn: () => axiosClient.get("/music").then((res) => res.data),
   });
 
   // handle bulk import
   const { mutate } = useMutation<
     BaseResponse,
     AxiosError<BaseErrorResponse>,
-    CreateMultipleArtist
+    CreateMultipleMusic
   >({
     mutationFn: (data) =>
-      axiosClient.post("/artist/bulk", data).then((res) => res.data),
+      axiosClient.post("/music/bulk", data).then((res) => res.data),
     onSuccess: (res) => {
       if (res.success) {
-        toast.success("Artists imported successfully");
+        toast.success("Musics imported successfully");
       } else {
-        toast.error("Failed to import artists");
+        toast.error("Failed to import musics");
       }
     },
     onError: (error) => {
       console.log(error.message);
-      toast.error(error.response?.data.message || "Failed to import artists");
+      toast.error(error.response?.data.message || "Failed to import musics");
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["artists"] });
+      queryClient.invalidateQueries({ queryKey: ["musics"] });
     },
   });
 
@@ -99,23 +92,22 @@ const ArtistsPage = () => {
     // setArtist(null);
   };
 
-  const handleEdit = (artist: Artist) => {
-    console.log(artist);
+  const handleEdit = (music: Music) => {
+    console.log(music);
     // setArtist(artist);
     // setIsOpen(true);
   };
 
-  const handleDelete = (artist: Artist) => {
-    console.log(artist);
+  const handleDelete = (music: Music) => {
+    console.log(music);
   };
 
-  const importArtists = (artists: { [key: string]: string }[]) => {
-    const result = createMultipleArtistSchema.safeParse(artists);
+  const importMusics = (musics: { [key: string]: string }[]) => {
+    const result = createMultipleMusicSchema.safeParse(musics);
 
     if (result.success) {
       mutate(result.data);
     } else {
-      console.log(result.error);
       toast.error("Invalid data");
     }
   };
@@ -129,15 +121,15 @@ const ArtistsPage = () => {
       totalPages={data?.pagination?.totalCount ?? 0}
     >
       <TableLayout
-        heading="Artists"
-        addText="Add Artist"
-        data={data?.artists}
+        heading="Musics"
+        addText="Add Music"
+        data={data?.musics ?? []}
         isLoading={isLoading}
         handleAdd={handleAdd}
-        fileName="artists.csv"
+        fileName="musics.csv"
         columns={modifyColumns}
         requiredKeys={requiredKeys}
-        handleImport={importArtists}
+        handleImport={importMusics}
       >
         {/* <UserPopup
         open={isOpen}
@@ -150,4 +142,4 @@ const ArtistsPage = () => {
   );
 };
 
-export default ArtistsPage;
+export default MusicsPage;

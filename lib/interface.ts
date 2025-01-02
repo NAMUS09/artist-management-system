@@ -1,5 +1,7 @@
 type Role = "super_admin" | "artist_manager" | "artist";
 
+type Gender = "male" | "female" | "other";
+
 interface User {
   id?: number;
   first_name: string;
@@ -8,7 +10,7 @@ interface User {
   password: string;
   phone: string;
   dob: Date;
-  gender: "male" | "female" | "other";
+  gender: Gender;
   address: string;
   created_at?: string;
   updated_at?: string;
@@ -17,25 +19,25 @@ interface User {
   expires?: string | null;
 }
 interface Artist {
-  id: number;
+  id?: number;
   name: string;
-  dob?: string;
-  gender: "Male" | "Female" | "Other";
+  dob?: Date;
+  gender: Gender;
   address?: string;
   first_release_year?: number;
   no_of_albums_released: number;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface Music {
-  id: number;
+  id?: number;
   artist_id: number;
   title: string;
   album_name: string;
   genre: "rnb" | "country" | "classic" | "rock" | "jazz";
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface BaseResponse {

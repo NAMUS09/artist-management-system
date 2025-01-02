@@ -1,14 +1,46 @@
 import { query } from "@/lib/db";
 import { Artist } from "@/lib/interface";
 
+interface ArtistWithId extends Artist {
+  id: number;
+}
+
 export const getArtistById = async (id: string) => {
   const rows = await query("SELECT * FROM artists WHERE id = $1", [id]);
   return rows[0];
 };
 
-export const getArtists = async () => {
-  const rows = await query("SELECT * FROM artists", []);
-  return rows;
+export const getArtistByName = async (name: string) => {
+  const rows = await query("SELECT * FROM artists WHERE name = $1", [name]);
+  return rows[0];
+};
+
+export const getArtists = async (page: number, pageSize: number) => {
+  const offset = (page - 1) * pageSize;
+  const rows = await query(
+    `SELECT * FROM artists ORDER BY id DESC OFFSET $1 LIMIT $2`,
+    [offset, pageSize]
+  );
+
+  const totalCountResult = await query(
+    `SELECT COUNT(*) as totalcount FROM artists`,
+    []
+  );
+
+  const totalCount = +totalCountResult[0]?.totalcount || 0;
+
+  // Calculate total pages
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  return {
+    artists: rows as ArtistWithId[],
+    pagination: {
+      currentPage: page,
+      pageSize,
+      totalPages,
+      totalCount,
+    },
+  };
 };
 
 export const createArtist = async (artist: Artist) => {

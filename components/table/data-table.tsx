@@ -1,11 +1,9 @@
-"use client";
-
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
+  PaginationState,
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
@@ -18,8 +16,41 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import { createContext, use, useState } from "react";
 import { DataTablePagination } from "../table/DataTablePagination";
+
+type PaginationTableContextValue = {
+  pagination: PaginationState;
+  setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
+  totalPages: number;
+};
+
+const PaginationTableContext = createContext<PaginationTableContextValue>(
+  {} as PaginationTableContextValue
+);
+
+export type PaginationTableProps = PaginationTableContextValue & {
+  children: React.ReactNode;
+};
+
+export const PaginationTable: React.FC<PaginationTableProps> = ({
+  pagination,
+  setPagination,
+  totalPages,
+  children,
+}) => {
+  return (
+    <PaginationTableContext
+      value={{
+        pagination,
+        setPagination,
+        totalPages,
+      }}
+    >
+      {children}
+    </PaginationTableContext>
+  );
+};
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -30,18 +61,32 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const paginationContext = use(PaginationTableContext);
+
+  if (!paginationContext) {
+    throw new Error(
+      "usePagination must be used within a PaginationTableProvider."
+    );
+  }
+
+  const { pagination, setPagination, totalPages } = paginationContext;
+
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    rowCount: totalPages || 1,
     state: {
+      pagination,
       sorting,
     },
+    manualPagination: true,
+    onPaginationChange: setPagination,
   });
 
   return (

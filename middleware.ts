@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { routes } from "./components/AppSidebar";
 import { getCurrentUser } from "./lib/auth";
 
 const PUBLIC_ROUTES = ["/login", "/register"];
@@ -6,6 +7,9 @@ const PUBLIC_ROUTES = ["/login", "/register"];
 const PRIVATE_API_ROUTES = ["/api/user", "/api/artist", "/api/music"];
 
 export async function middleware(req: NextRequest) {
+  const headers = new Headers(req.headers);
+  headers.set("x-current-path", req.nextUrl.pathname);
+
   const currentUser = await getCurrentUser();
   const { pathname } = req.nextUrl;
 
@@ -24,17 +28,30 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+
   // If the user is not signed in and the route is not public, redirect to login
-  if (!currentUser && !PUBLIC_ROUTES.includes(pathname)) {
+  if (!currentUser && !isPublicRoute) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
   // If the user is signed in and the route is public, redirect to home
-  if (currentUser && PUBLIC_ROUTES.includes(pathname)) {
-    return NextResponse.redirect(new URL("/", req.url));
+  if (
+    currentUser &&
+    (isPublicRoute ||
+      routes.some(
+        (route) =>
+          route.url === pathname && !route.roles.includes(currentUser.role)
+      ))
+  ) {
+    const validRoutesForUser = routes.filter((route) =>
+      route.roles.includes(currentUser.role)
+    );
+    // Redirect to the first valid route for the user
+    return NextResponse.redirect(new URL(validRoutesForUser[0].url, req.url));
   }
 
-  return NextResponse.next();
+  return NextResponse.next({ headers });
 }
 
 export const config = {

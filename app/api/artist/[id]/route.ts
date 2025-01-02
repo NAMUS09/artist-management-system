@@ -1,8 +1,9 @@
-import { asyncHandler } from "@/app/utils/asyncHandler";
+import roleAsyncHandler from "@/app/utils/roleAsyncHandler";
 import { query } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-export const GET = asyncHandler(
+export const GET = roleAsyncHandler(
+  ["super_admin", "artist_manager"],
   async (req: Request, { params }: { params: Promise<{ id: string }> }) => {
     const { id } = await params;
 

@@ -82,13 +82,25 @@ export const updateUserById = async (id: number, user: User) => {
     dob,
     gender,
     address,
+    role,
   } = user;
   const rows = await query(
     `UPDATE users
-         SET first_name = $1, last_name = $2, email = $3, password = $4, phone = $5, dob = $6, gender = $7, address = $8
-         WHERE id = $9
+         SET first_name = $1, last_name = $2, email = $3, password = $4, phone = $5, dob = $6, gender = $7, address = $8, role = $9
+         WHERE id = $10
          RETURNING *`,
-    [first_name, last_name, email, password, phone, dob, gender, address, id]
+    [
+      first_name,
+      last_name,
+      email,
+      password,
+      phone,
+      dob,
+      gender,
+      address,
+      role,
+      id,
+    ]
   );
 
   return rows;

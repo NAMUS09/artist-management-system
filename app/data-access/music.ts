@@ -1,6 +1,10 @@
 import { query } from "@/lib/db";
 import { Music } from "@/lib/interface";
 
+interface MusicWithId extends Music {
+  id: number;
+}
+
 export const getMusicById = async (id: string) => {
   const rows = await query("SELECT * FROM musics WHERE id = $1", [id]);
   return rows[0];
@@ -13,9 +17,34 @@ export const getMusicsByArtistId = async (artistId: string) => {
   return rows;
 };
 
-export const getMusics = async () => {
-  const rows = await query("SELECT * FROM musics", []);
-  return rows;
+export const getMusics = async (page: number, pageSize: number) => {
+  const offset = (page - 1) * pageSize;
+  const rows = await query(
+    `SELECT m.*, a.name as artist_name FROM musics as m
+   INNER JOIN artists as a ON m.artist_id = a.id
+   ORDER BY m.id DESC OFFSET $1 LIMIT $2`,
+    [offset, pageSize]
+  );
+
+  const totalCountResult = await query(
+    `SELECT COUNT(*) as totalcount FROM musics`,
+    []
+  );
+
+  const totalCount = +totalCountResult[0]?.totalcount || 0;
+
+  // Calculate total pages
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  return {
+    musics: rows as MusicWithId[],
+    pagination: {
+      currentPage: page,
+      pageSize,
+      totalPages,
+      totalCount,
+    },
+  };
 };
 
 export const createMusic = async (music: Music) => {

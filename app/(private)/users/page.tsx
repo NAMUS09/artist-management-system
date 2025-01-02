@@ -9,7 +9,8 @@ import {
   CreateMultipleUser,
   createMultipleUserSchema,
 } from "@/app/schemas/userSchema";
-import { PaginationTable } from "@/components/table/DataTablePagination";
+
+import { PaginationTable } from "@/components/table/data-table";
 import TableLayout from "@/components/TableLayout";
 import {
   BaseErrorResponse,
@@ -18,10 +19,12 @@ import {
   User,
 } from "@/lib/interface";
 import {
-  useInfiniteQuery,
+  keepPreviousData,
   useMutation,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+import { PaginationState } from "@tanstack/react-table";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -74,32 +77,31 @@ const requiredKeys = [
 
 const UsersPage = () => {
   const queryClient = useQueryClient();
-  const [pageSize, setPageSize] = useState(10);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
   const [user, setUser] = useState<User | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  // get users
-  const {
-    data,
-    isRefetching,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    fetchPreviousPage,
-  } = useInfiniteQuery<UsersResponse>({
-    queryKey: ["users", "infinite", pageSize],
-    initialPageParam: 1,
-    queryFn: ({ pageParam = 1 }) =>
+  const { data, isLoading } = useQuery<UsersResponse>({
+    queryKey: ["users", pagination],
+    queryFn: () =>
       axiosClient
-        .get("/user", { params: { limit: pageSize, page: pageParam } })
+        .get("/user", {
+          params: {
+            page: pagination.pageIndex + 1,
+            limit: pagination.pageSize,
+          },
+        })
         .then((res) => res.data),
-    getPreviousPageParam: (firstPage) => firstPage.pagination.currentPage - 1,
-    getNextPageParam: (lastPage) => lastPage.pagination.currentPage + 1,
+    placeholderData: keepPreviousData,
   });
 
   // handle bulk import
   const { mutate } = useMutation<
-    BaseResponse,
+    BaseResponse & { data: User[] },
     AxiosError<BaseErrorResponse>,
     CreateMultipleUser
   >({
@@ -147,20 +149,17 @@ const UsersPage = () => {
 
   const modifyColumns = appendActionColumn(columns, handleEdit, handleDelete);
 
-  const flattenData = data?.pages.map((page) => page.users).flat();
-
   return (
     <PaginationTable
-      setPageSize={setPageSize}
-      fetchNextPage={fetchNextPage}
-      fetchPreviousPage={fetchPreviousPage}
-      hasNextPage={hasNextPage}
+      pagination={pagination}
+      setPagination={setPagination}
+      totalPages={data?.pagination.totalCount ?? 0}
     >
       <TableLayout
         heading="Users"
         addText="Add User"
-        data={flattenData}
-        isLoading={isLoading || isRefetching}
+        data={data?.users ?? []}
+        isLoading={isLoading}
         handleAdd={handleAdd}
         fileName="users.csv"
         columns={modifyColumns}

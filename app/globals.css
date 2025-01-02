@@ -7,6 +7,11 @@
   width: 0.4rem;
 }
 
+/* Horizontal scrollbar */
+::-webkit-scrollbar:horizontal {
+  height: 0.2rem; /* Adjust the height of the horizontal scrollbar */
+}
+
 /* Track */
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
