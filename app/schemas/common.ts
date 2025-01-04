@@ -20,9 +20,12 @@ export const phoneNumberSchema = z
 export const roleSchema = z
   .string()
   .nonempty({ message: "Role is required" })
-  .refine((value) => ["super_admin", "admin", "user"].includes(value), {
-    message: "Please select a valid role",
-  });
+  .refine(
+    (value) => ["super_admin", "artist_manager", "artist"].includes(value),
+    {
+      message: "Please select a valid role",
+    }
+  );
 
 export const genderSchema = z
   .string()
