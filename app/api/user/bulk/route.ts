@@ -40,7 +40,7 @@ export const POST = roleAsyncHandler(
       await createUser({
         ...rest,
         dob: new Date(dob),
-        password: await hash(user.password),
+        password: await hash(user.password!),
       });
     }
 

@@ -1,25 +1,44 @@
 import { z } from "zod";
 import {
   dobApiSchema,
+  dobSchema,
   emailSchema,
   genderSchema,
-  passwordSchema,
   phoneNumberSchema,
   roleSchema,
 } from "./common";
 
-export const createUserSchema = z.object({
-  id: z.number().optional(),
-  first_name: z.string(),
-  last_name: z.string(),
-  email: emailSchema,
-  dob: dobApiSchema,
-  password: passwordSchema,
-  phone: phoneNumberSchema,
-  role: roleSchema,
-  gender: genderSchema,
-  address: z.string(),
-});
+export const createUserSchema = z
+  .object({
+    id: z.number().optional(),
+    first_name: z.string().nonempty({ message: "First name is required" }),
+    last_name: z.string().nonempty({ message: "Last name is required" }),
+    email: emailSchema,
+    dob: z.union([dobApiSchema, dobSchema]),
+    password: z.string().optional(),
+    phone: phoneNumberSchema,
+    role: roleSchema,
+    gender: genderSchema,
+    address: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    // If id is not present, password is required
+    if (!data.id) {
+      if (!data.password) {
+        ctx.addIssue({
+          path: ["password"],
+          code: z.ZodIssueCode.custom,
+          message: "Password is required",
+        });
+      } else if (data.password.length < 8) {
+        ctx.addIssue({
+          path: ["password"],
+          code: z.ZodIssueCode.custom,
+          message: "Password must be at least 8 characters long",
+        });
+      }
+    }
+  });
 
 export const createMultipleUserSchema = z.array(createUserSchema);
 

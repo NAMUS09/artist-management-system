@@ -21,11 +21,11 @@ type DateProps = {
   disabled?: boolean;
 };
 
-const FormDate: React.FC<DateProps> = ({ form, label, placeholder }) => {
+const FormDate: React.FC<DateProps> = ({ form, name, label, placeholder }) => {
   return (
     <FormField
       control={form.control}
-      name="dob"
+      name={name}
       render={({ field }) => (
         <FormItem className="flex flex-col">
           {label && <FormLabel>{label}</FormLabel>}

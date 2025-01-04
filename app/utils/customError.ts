@@ -1,4 +1,4 @@
-type HttpCode = 400 | 404 | 500 | 401;
+type HttpCode = 400 | 404 | 500 | 401 | 403 | 422 | 409 | 200 | 201 | 204;
 
 class CustomError extends Error {
   code: HttpCode;

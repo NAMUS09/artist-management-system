@@ -1,4 +1,4 @@
-import { UserRegisterSchema, userRegisterSchema } from "@/app/schemas/auth";
+import { CreateUser, createUserSchema } from "@/app/schemas/userSchema";
 import axiosClient from "@/axios";
 import DialogLayout from "@/components/DialogLayout";
 import Button from "@/components/form/Button";
@@ -28,16 +28,17 @@ const UserPopup = ({
 }) => {
   const queryClient = useQueryClient();
 
-  const form = useForm<UserRegisterSchema>({
-    resolver: zodResolver(userRegisterSchema),
+  const form = useForm<CreateUser>({
+    resolver: zodResolver(createUserSchema),
     defaultValues: {
+      id: undefined,
       first_name: "",
       last_name: "",
       email: "",
       password: "",
       phone: "",
       address: "",
-      dob: null,
+      dob: undefined,
       gender: undefined,
       role: undefined,
     },
@@ -46,7 +47,7 @@ const UserPopup = ({
   const { mutate, isPending } = useMutation<
     BaseResponse & User,
     AxiosError<BaseErrorResponse>,
-    UserRegisterSchema
+    CreateUser
   >({
     mutationFn: async (data) =>
       axiosClient.post("/user/upsert", data).then((res) => res.data),
@@ -74,6 +75,7 @@ const UserPopup = ({
 
   useEffect(() => {
     if (user) {
+      form.setValue("id", user.id);
       form.setValue("first_name", user.first_name);
       form.setValue("last_name", user.last_name);
       form.setValue("email", user.email);
@@ -81,11 +83,11 @@ const UserPopup = ({
       form.setValue("address", user.address);
       form.setValue("gender", user.gender);
       form.setValue("role", user.role);
-      form.setValue("dob", new Date(user.dob));
+      form.setValue("dob", new Date(user.dob?.toString() ?? ""));
     }
   }, [user, form]);
 
-  const onSubmit = async (data: UserRegisterSchema) => {
+  const onSubmit = async (data: CreateUser) => {
     mutate({ ...data, id: user?.id });
   };
 

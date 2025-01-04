@@ -43,7 +43,7 @@ const ArtistPopup = ({
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      form.reset();
+      form.reset(defaultValues);
       setArtist(null);
     }
     setOpen(open);
