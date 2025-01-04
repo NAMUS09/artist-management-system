@@ -2,6 +2,7 @@ import { createArtist, updateArtist } from "@/app/data-access/artist";
 import { CreateArtist, createArtistSchema } from "@/app/schemas/artistSchema";
 import roleAsyncHandler from "@/app/utils/roleAsyncHandler";
 import { validateRequestBody } from "@/app/utils/validateBody";
+import { Artist } from "@/lib/interface";
 
 import { NextResponse } from "next/server";
 
@@ -36,7 +37,7 @@ export const POST = roleAsyncHandler(
       address,
       first_release_year: +first_release_year,
       no_of_albums_released: +no_of_albums_released,
-    };
+    } as Artist;
 
     if (id) {
       // Update existing artist

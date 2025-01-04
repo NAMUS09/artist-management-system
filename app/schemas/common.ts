@@ -18,16 +18,18 @@ export const phoneNumberSchema = z
   });
 
 export const roleSchema = z
-  .enum(["super_admin", "artist_manager", "artist"], {
-    message: "Please select a role",
-  })
-  .default("artist");
+  .string()
+  .nonempty({ message: "Role is required" })
+  .refine((value) => ["super_admin", "admin", "user"].includes(value), {
+    message: "Please select a valid role",
+  });
 
 export const genderSchema = z
-  .enum(["male", "female", "other"], {
-    message: "Please select a gender",
-  })
-  .default("other");
+  .string()
+  .nonempty({ message: "Gender is required" })
+  .refine((value) => ["male", "female", "other"].includes(value), {
+    message: "Please select a valid gender",
+  });
 
 export const dobApiSchema = z
   .string()

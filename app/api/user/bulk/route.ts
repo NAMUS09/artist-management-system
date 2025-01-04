@@ -6,6 +6,7 @@ import {
 import { hash } from "@/app/utils/common";
 import roleAsyncHandler from "@/app/utils/roleAsyncHandler";
 import { validateRequestBody } from "@/app/utils/validateBody";
+import { User } from "@/lib/interface";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = roleAsyncHandler(
@@ -41,7 +42,7 @@ export const POST = roleAsyncHandler(
         ...rest,
         dob: new Date(dob),
         password: await hash(user.password!),
-      });
+      } as User);
     }
 
     return NextResponse.json({ success: true, message: "Bulk user created" });

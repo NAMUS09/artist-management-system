@@ -1,12 +1,18 @@
 import { z } from "zod";
 
+const genereSchema = z
+  .string()
+  .nonempty({ message: "Genre is required" })
+  .refine(
+    (value) => ["rnb", "country", "classic", "rock", "jazz"].includes(value),
+    { message: "Please select a valid genre" }
+  );
+
 export const createMusicSchema = z.object({
   artist_name: z.string().nonempty({ message: "Artist name is required" }),
   title: z.string().nonempty({ message: "Title is required" }),
   album_name: z.string().nonempty({ message: "Album name is required" }),
-  genre: z.enum(["rnb", "country", "classic", "rock", "jazz"], {
-    message: "Please select a genre",
-  }),
+  genre: genereSchema,
 });
 
 export const createMusicSchemaFromId = z.object({
@@ -14,12 +20,7 @@ export const createMusicSchemaFromId = z.object({
   artist_id: z.string().nonempty({ message: "Artist name is required" }),
   title: z.string().nonempty({ message: "Title is required" }),
   album_name: z.string().nonempty({ message: "Album name is required" }),
-  genre: z.union([
-    z.string().nonempty({ message: "Genre is required" }),
-    z.enum(["rnb", "country", "classic", "rock", "jazz"], {
-      message: "Please select a genre",
-    }),
-  ]),
+  genre: genereSchema,
 });
 
 export const createMultipleMusicSchema = z.array(createMusicSchema);

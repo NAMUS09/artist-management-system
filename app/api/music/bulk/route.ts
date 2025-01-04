@@ -6,6 +6,7 @@ import {
 } from "@/app/schemas/musicSchema";
 import roleAsyncHandler from "@/app/utils/roleAsyncHandler";
 import { validateRequestBody } from "@/app/utils/validateBody";
+import { Music } from "@/lib/interface";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = roleAsyncHandler(
@@ -40,7 +41,7 @@ export const POST = roleAsyncHandler(
       await createMusic({
         ...rest,
         artist_id: dbArtist.id,
-      });
+      } as Music);
     }
 
     return NextResponse.json({ success: true, message: "Bulk musics created" });

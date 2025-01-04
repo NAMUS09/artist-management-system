@@ -11,6 +11,7 @@ import {
 import CustomError from "@/app/utils/customError";
 import roleAsyncHandler from "@/app/utils/roleAsyncHandler";
 import { validateRequestBody } from "@/app/utils/validateBody";
+import { Music } from "@/lib/interface";
 import { NextResponse } from "next/server";
 
 export const POST = roleAsyncHandler(
@@ -34,7 +35,7 @@ export const POST = roleAsyncHandler(
       title,
       album_name,
       genre,
-    };
+    } as Music;
 
     // check artist_id exists
     const dbArtist = await getArtistById(+artist_id);

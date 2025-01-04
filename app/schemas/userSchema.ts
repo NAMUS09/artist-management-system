@@ -17,14 +17,8 @@ export const createUserSchema = z
     dob: z.union([dobApiSchema, dobSchema]),
     password: z.string().optional(),
     phone: phoneNumberSchema,
-    role: z.union([
-      z.string().nonempty({ message: "Role is required" }),
-      roleSchema,
-    ]),
-    gender: z.union([
-      z.string().nonempty({ message: "Gender is required" }),
-      genderSchema,
-    ]),
+    role: roleSchema,
+    gender: genderSchema,
     address: z.string(),
   })
   .superRefine((data, ctx) => {

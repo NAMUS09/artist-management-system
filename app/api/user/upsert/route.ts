@@ -44,7 +44,7 @@ export const POST = roleAsyncHandler(["super_admin"], async (req: Request) => {
       body.password = user.password;
     }
 
-    const rows = await updateUserById(id, { ...user, ...prepareUser });
+    const rows = await updateUserById(id, { ...user, ...prepareUser } as User);
 
     return NextResponse.json({
       status: 200,

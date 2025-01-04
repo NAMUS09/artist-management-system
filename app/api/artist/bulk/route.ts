@@ -5,6 +5,7 @@ import {
 } from "@/app/schemas/artistSchema";
 import roleAsyncHandler from "@/app/utils/roleAsyncHandler";
 import { validateRequestBody } from "@/app/utils/validateBody";
+import { Artist } from "@/lib/interface";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = roleAsyncHandler(
@@ -42,7 +43,7 @@ export const POST = roleAsyncHandler(
         dob: new Date(dob),
         first_release_year: Number(first_release_year),
         no_of_albums_released: Number(no_of_albums_released),
-      });
+      } as Artist);
     }
 
     return NextResponse.json({ success: true, message: "Bulk artist created" });

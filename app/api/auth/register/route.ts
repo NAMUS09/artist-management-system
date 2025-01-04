@@ -7,6 +7,7 @@ import { asyncHandler } from "@/app/utils/asyncHandler";
 import { hash } from "@/app/utils/common";
 import CustomError from "@/app/utils/customError";
 import { validateRequestBody } from "@/app/utils/validateBody";
+import { User } from "@/lib/interface";
 import { NextResponse } from "next/server";
 
 export const POST = asyncHandler(async (request: Request) => {
@@ -53,7 +54,7 @@ export const POST = asyncHandler(async (request: Request) => {
     gender,
     address,
     phone,
-  });
+  } as User);
 
   const response = {
     success: true,
