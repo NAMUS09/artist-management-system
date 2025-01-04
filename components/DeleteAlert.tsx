@@ -13,12 +13,15 @@ type DeleteAlertProps = {
   isOpen: boolean;
   onOpenChange: React.Dispatch<React.SetStateAction<boolean>>;
   onDelete: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setState: React.Dispatch<React.SetStateAction<any | null>>;
 };
 
 const DeleteAlert: React.FC<DeleteAlertProps> = ({
   isOpen,
   onOpenChange,
   onDelete,
+  setState,
 }) => {
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
@@ -31,7 +34,14 @@ const DeleteAlert: React.FC<DeleteAlertProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel
+            onClick={() => {
+              onOpenChange(false);
+              setState(null);
+            }}
+          >
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
               onOpenChange(false);

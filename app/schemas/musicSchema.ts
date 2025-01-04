@@ -14,9 +14,12 @@ export const createMusicSchemaFromId = z.object({
   artist_id: z.string().nonempty({ message: "Artist name is required" }),
   title: z.string().nonempty({ message: "Title is required" }),
   album_name: z.string().nonempty({ message: "Album name is required" }),
-  genre: z.enum(["rnb", "country", "classic", "rock", "jazz"], {
-    message: "Please select a genre",
-  }),
+  genre: z.union([
+    z.string().nonempty({ message: "Genre is required" }),
+    z.enum(["rnb", "country", "classic", "rock", "jazz"], {
+      message: "Please select a genre",
+    }),
+  ]),
 });
 
 export const createMultipleMusicSchema = z.array(createMusicSchema);

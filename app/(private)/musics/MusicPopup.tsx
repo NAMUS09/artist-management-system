@@ -61,12 +61,10 @@ const MusicPopup = ({
   };
 
   useEffect(() => {
-    if (music) {
-      form.setValue("artist_id", music.artist_id.toString());
-      form.setValue("title", music.title);
-      form.setValue("album_name", music.album_name);
-      form.setValue("genre", music.genre);
-    }
+    form.setValue("artist_id", music?.artist_id?.toString() ?? "");
+    form.setValue("title", music?.title ?? "");
+    form.setValue("album_name", music?.album_name ?? "");
+    form.setValue("genre", music?.genre ?? "");
   }, [music, form]);
 
   const { data } = useQuery<ArtistsResponse>({

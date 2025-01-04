@@ -50,20 +50,18 @@ const ArtistPopup = ({
   };
 
   useEffect(() => {
-    if (artist) {
-      form.setValue("name", artist.name);
-      form.setValue("address", artist.address ?? "");
-      form.setValue("gender", artist.gender);
-      form.setValue("dob", new Date(artist.dob?.toString() ?? ""));
-      form.setValue(
-        "first_release_year",
-        artist.first_release_year?.toString() ?? ""
-      );
-      form.setValue(
-        "no_of_albums_released",
-        artist.no_of_albums_released.toString() ?? ""
-      );
-    }
+    form.setValue("name", artist?.name ?? "");
+    form.setValue("address", artist?.address ?? "");
+    form.setValue("gender", artist?.gender ?? "");
+    form.setValue("dob", artist?.dob ? new Date(artist.dob.toString()) : "");
+    form.setValue(
+      "first_release_year",
+      artist?.first_release_year?.toString() ?? ""
+    );
+    form.setValue(
+      "no_of_albums_released",
+      artist?.no_of_albums_released.toString() ?? ""
+    );
   }, [artist, form]);
 
   const { mutate, isPending } = useMutation<
@@ -135,13 +133,13 @@ const ArtistPopup = ({
               />
               <Input
                 type="text"
-                placeholder="First Release Year"
+                placeholder="First release year"
                 form={form}
                 name="first_release_year"
               />
               <Input
                 type="text"
-                placeholder="Albums released"
+                placeholder="No of albums released"
                 form={form}
                 name="no_of_albums_released"
               />

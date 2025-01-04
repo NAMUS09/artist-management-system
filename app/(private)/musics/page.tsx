@@ -176,6 +176,7 @@ const MusicsPage = () => {
           isOpen={deleteAlert}
           onOpenChange={setDeleteAlert}
           onDelete={onDeleteMusic}
+          setState={setMusic}
         />
       </TableLayout>
     </PaginationTable>

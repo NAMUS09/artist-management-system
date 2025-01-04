@@ -74,17 +74,15 @@ const UserPopup = ({
   };
 
   useEffect(() => {
-    if (user) {
-      form.setValue("id", user.id);
-      form.setValue("first_name", user.first_name);
-      form.setValue("last_name", user.last_name);
-      form.setValue("email", user.email);
-      form.setValue("phone", user.phone);
-      form.setValue("address", user.address);
-      form.setValue("gender", user.gender);
-      form.setValue("role", user.role);
-      form.setValue("dob", new Date(user.dob?.toString() ?? ""));
-    }
+    form.setValue("id", user?.id);
+    form.setValue("first_name", user?.first_name ?? "");
+    form.setValue("last_name", user?.last_name ?? "");
+    form.setValue("email", user?.email ?? "");
+    form.setValue("phone", user?.phone ?? "");
+    form.setValue("address", user?.address ?? "");
+    form.setValue("gender", user?.gender ?? "");
+    form.setValue("role", user?.role ?? "");
+    form.setValue("dob", user?.dob ? new Date(user.dob!.toString()) : "");
   }, [user, form]);
 
   const onSubmit = async (data: CreateUser) => {

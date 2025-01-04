@@ -208,6 +208,7 @@ const UsersPage = () => {
         <DeleteAlert
           isOpen={deleteAlert}
           onOpenChange={setDeleteAlert}
+          setState={setUser}
           onDelete={onDeleteUser}
         />
       </TableLayout>

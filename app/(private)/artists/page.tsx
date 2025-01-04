@@ -201,6 +201,7 @@ const ArtistsPage = () => {
           isOpen={deleteAlert}
           onOpenChange={setDeleteAlert}
           onDelete={onDeleteArtist}
+          setState={setArtist}
         />
       </TableLayout>
     </PaginationTable>

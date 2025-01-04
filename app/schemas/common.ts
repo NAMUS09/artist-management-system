@@ -17,13 +17,17 @@ export const phoneNumberSchema = z
     message: "Please enter a valid 10-digit phone number",
   });
 
-export const roleSchema = z.enum(["super_admin", "artist_manager", "artist"], {
-  message: "Please select a role",
-});
+export const roleSchema = z
+  .enum(["super_admin", "artist_manager", "artist"], {
+    message: "Please select a role",
+  })
+  .default("artist");
 
-export const genderSchema = z.enum(["male", "female", "other"], {
-  message: "Please select a gender",
-});
+export const genderSchema = z
+  .enum(["male", "female", "other"], {
+    message: "Please select a gender",
+  })
+  .default("other");
 
 export const dobApiSchema = z
   .string()
