@@ -50,7 +50,7 @@ const Select: React.FC<SelectProps> = ({
           {label && <FormLabel>{label}</FormLabel>}
           <ShadSelect
             onValueChange={field.onChange}
-            defaultValue={field.value}
+            value={field.value ?? ""}
             disabled={disabled || form.formState.isSubmitting}
           >
             <FormControl>

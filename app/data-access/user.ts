@@ -105,3 +105,8 @@ export const updateUserById = async (id: number, user: User) => {
 
   return rows;
 };
+
+export const deleteUser = async (id: number) => {
+  const rows = await query(`DELETE FROM users WHERE id = $1 RETURNING *`, [id]);
+  return rows;
+};

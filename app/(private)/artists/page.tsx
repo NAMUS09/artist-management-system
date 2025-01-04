@@ -6,6 +6,7 @@ import {
 } from "@/app/schemas/artistSchema";
 import appendActionColumn from "@/app/utils/appendActionColumn";
 import axiosClient from "@/axios";
+import DeleteAlert from "@/components/DeleteAlert";
 import { PaginationTable } from "@/components/table/data-table";
 import TableLayout from "@/components/TableLayout";
 import {
@@ -17,8 +18,10 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { AxiosError } from "axios";
+import moment from "moment";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import ArtistPopup from "./ArtistPopup";
 
 type ArtistsResponse = BaseResponse &
   PaginationResponse & {
@@ -37,6 +40,18 @@ const columns: ColumnDef<Artist>[] = [
   {
     accessorKey: "gender",
     header: "Gender",
+  },
+  {
+    accessorKey: "dob",
+    header: "Date of birth",
+    cell: ({ row }) => {
+      const date = moment(row.original.dob).format("ll");
+      return <span>{date}</span>;
+    },
+  },
+  {
+    accessorKey: "address",
+    header: "Address",
   },
   {
     accessorKey: "first_release_year",
@@ -65,9 +80,14 @@ const ArtistsPage = () => {
     pageSize: 10,
   });
 
+  const [isOpen, setIsOpen] = useState(false);
+  const [artist, setArtist] = useState<Artist | null>(null);
+  const [deleteAlert, setDeleteAlert] = useState(false);
+
   const { data, isLoading } = useQuery<ArtistsResponse>({
     queryKey: ["artists", pagination],
     queryFn: () => axiosClient.get("/artist").then((res) => res.data),
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 
   // handle bulk import
@@ -91,22 +111,54 @@ const ArtistsPage = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["artists"] });
+      queryClient.invalidateQueries({ queryKey: ["musics"] });
+      queryClient.invalidateQueries({ queryKey: ["artists-dropdown"] });
+    },
+  });
+
+  // delete artist
+  const { mutate: deleteMutate } = useMutation<
+    BaseResponse,
+    AxiosError<BaseErrorResponse>,
+    number
+  >({
+    mutationFn: (id) =>
+      axiosClient.delete(`/artist/${id}`).then((res) => res.data),
+    onSuccess: (res) => {
+      if (res.success) {
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
+      }
+    },
+    onError: (error) => {
+      console.log(error.message);
+      toast.error(error.response?.data.message || "Failed to delete artist");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["artists"] });
+      queryClient.invalidateQueries({ queryKey: ["musics"] });
+      queryClient.invalidateQueries({ queryKey: ["artists-dropdown"] });
     },
   });
 
   const handleAdd = () => {
-    // setIsOpen(true);
-    // setArtist(null);
+    setArtist(null);
+    setIsOpen(true);
   };
 
   const handleEdit = (artist: Artist) => {
-    console.log(artist);
-    // setArtist(artist);
-    // setIsOpen(true);
+    setArtist(artist);
+    setIsOpen(true);
   };
 
   const handleDelete = (artist: Artist) => {
-    console.log(artist);
+    setArtist(artist);
+    setDeleteAlert(true);
+  };
+
+  const onDeleteArtist = () => {
+    deleteMutate(artist?.id ?? 0);
   };
 
   const importArtists = (artists: { [key: string]: string }[]) => {
@@ -139,12 +191,17 @@ const ArtistsPage = () => {
         requiredKeys={requiredKeys}
         handleImport={importArtists}
       >
-        {/* <UserPopup
-        open={isOpen}
-        setOpen={setIsOpen}
-        user={user}
-        setUser={setUser}
-      /> */}
+        <ArtistPopup
+          open={isOpen}
+          setOpen={setIsOpen}
+          artist={artist}
+          setArtist={setArtist}
+        />
+        <DeleteAlert
+          isOpen={deleteAlert}
+          onOpenChange={setDeleteAlert}
+          onDelete={onDeleteArtist}
+        />
       </TableLayout>
     </PaginationTable>
   );

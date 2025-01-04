@@ -33,30 +33,29 @@ const TableLayout = <T,>({
   return (
     <div className="container mx-auto p-3">
       <h1 className="text-2xl font-bold mb-2">{heading}</h1>
-      {isLoading && <p>Loading...</p>}
-      {!isLoading && (
-        <>
-          <div className="flex gap-2">
-            <Button onClick={handleAdd}>
-              {" "}
-              <Plus />
-              {addText}
-            </Button>
-            <ImportCSV
-              requiredKeys={requiredKeys ?? []}
-              handleImport={handleImport}
-            />
-            <ExportCSVButton
-              data={(data as Record<string, number | string>[]) ?? []}
-              fileName={fileName ?? "export.csv"}
-            />
-          </div>
 
-          <div className="mt-3">
-            <DataTable columns={columns} data={data ?? []} />
-          </div>
-        </>
-      )}
+      <div className="flex gap-2">
+        <Button disabled={isLoading} onClick={handleAdd}>
+          {" "}
+          <Plus />
+          {addText}
+        </Button>
+        <ImportCSV
+          requiredKeys={requiredKeys ?? []}
+          disabled={isLoading}
+          handleImport={handleImport}
+        />
+
+        <ExportCSVButton
+          data={(data as Record<string, number | string>[]) ?? []}
+          fileName={fileName ?? "export.csv"}
+        />
+      </div>
+
+      <div className="mt-3">
+        <DataTable columns={columns} data={data ?? []} isLoading={isLoading} />
+      </div>
+
       {children}
     </div>
   );

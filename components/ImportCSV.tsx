@@ -33,9 +33,11 @@ function parseCSV<T extends string>(
 const ImportCSV = ({
   requiredKeys,
   handleImport,
+  disabled,
 }: {
   requiredKeys: string[];
   handleImport: (data: { [key: string]: string }[]) => void;
+  disabled?: boolean;
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null); // Ref for the file input
 
@@ -85,7 +87,7 @@ const ImportCSV = ({
         onChange={handleFileUpload}
       />
 
-      <Button onClick={handleButtonClick}>
+      <Button onClick={handleButtonClick} disabled={disabled}>
         <CiImport />
         Import CSV
       </Button>

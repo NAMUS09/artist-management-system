@@ -6,6 +6,7 @@ import {
 } from "@/app/schemas/musicSchema";
 import appendActionColumn from "@/app/utils/appendActionColumn";
 import axiosClient from "@/axios";
+import DeleteAlert from "@/components/DeleteAlert";
 import { PaginationTable } from "@/components/table/data-table";
 import TableLayout from "@/components/TableLayout";
 import {
@@ -19,6 +20,7 @@ import { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import MusicPopup from "./MusicPopup";
 
 type MusicsResponse = BaseResponse &
   PaginationResponse & {
@@ -57,10 +59,14 @@ const MusicsPage = () => {
     pageIndex: 0,
     pageSize: 10,
   });
+  const [isOpen, setIsOpen] = useState(false);
+  const [music, setMusic] = useState<Music | null>(null);
+  const [deleteAlert, setDeleteAlert] = useState(false);
 
   const { data, isLoading } = useQuery<MusicsResponse>({
     queryKey: ["musics", pagination],
     queryFn: () => axiosClient.get("/music").then((res) => res.data),
+    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 
   // handle bulk import
@@ -87,19 +93,48 @@ const MusicsPage = () => {
     },
   });
 
+  // delete artist
+  const { mutate: deleteMutate } = useMutation<
+    BaseResponse,
+    AxiosError<BaseErrorResponse>,
+    number
+  >({
+    mutationFn: (id) =>
+      axiosClient.delete(`/music/${id}`).then((res) => res.data),
+    onSuccess: (res) => {
+      if (res.success) {
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
+      }
+    },
+    onError: (error) => {
+      console.log(error.message);
+      toast.error(error.response?.data.message || "Failed to delete music");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["musics"] });
+    },
+  });
+
   const handleAdd = () => {
-    // setIsOpen(true);
-    // setArtist(null);
+    setMusic(null);
+    setIsOpen(true);
   };
 
   const handleEdit = (music: Music) => {
-    console.log(music);
-    // setArtist(artist);
-    // setIsOpen(true);
+    setMusic(music);
+    setIsOpen(true);
   };
 
   const handleDelete = (music: Music) => {
-    console.log(music);
+    setMusic(music);
+  };
+
+  const onDeleteMusic = () => {
+    if (music && music.id) {
+      deleteMutate(music.id);
+    }
   };
 
   const importMusics = (musics: { [key: string]: string }[]) => {
@@ -131,12 +166,17 @@ const MusicsPage = () => {
         requiredKeys={requiredKeys}
         handleImport={importMusics}
       >
-        {/* <UserPopup
-        open={isOpen}
-        setOpen={setIsOpen}
-        user={user}
-        setUser={setUser}
-      /> */}
+        <MusicPopup
+          open={isOpen}
+          setOpen={setIsOpen}
+          music={music}
+          setMusic={setMusic}
+        />
+        <DeleteAlert
+          isOpen={deleteAlert}
+          onOpenChange={setDeleteAlert}
+          onDelete={onDeleteMusic}
+        />
       </TableLayout>
     </PaginationTable>
   );

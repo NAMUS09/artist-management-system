@@ -2,6 +2,8 @@ type Role = "super_admin" | "artist_manager" | "artist";
 
 type Gender = "male" | "female" | "other";
 
+type Genre = "rnb" | "country" | "classic" | "rock" | "jazz";
+
 interface User {
   id?: number;
   first_name: string;
@@ -35,7 +37,7 @@ interface Music {
   artist_id: number;
   title: string;
   album_name: string;
-  genre: "rnb" | "country" | "classic" | "rock" | "jazz";
+  genre: Genre;
   created_at?: string;
   updated_at?: string;
 }
@@ -63,6 +65,7 @@ export {
   type Artist,
   type BaseErrorResponse,
   type BaseResponse,
+  type Genre,
   type Music,
   type Role,
   type User,

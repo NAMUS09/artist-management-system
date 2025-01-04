@@ -5,7 +5,7 @@ interface MusicWithId extends Music {
   id: number;
 }
 
-export const getMusicById = async (id: string) => {
+export const getMusicById = async (id: number) => {
   const rows = await query("SELECT * FROM musics WHERE id = $1", [id]);
   return rows[0];
 };
@@ -65,7 +65,7 @@ export const updateMusic = async (id: number, music: Music) => {
   const { artist_id, title, album_name, genre } = music;
   // Update existing album
   const rows = await query(
-    `UPDATE albums
+    `UPDATE musics
          SET artist_id = $1, title = $2, album_name = $3, genre = $4
          WHERE id = $5
          RETURNING *`,
@@ -73,4 +73,8 @@ export const updateMusic = async (id: number, music: Music) => {
   );
 
   return rows;
+};
+
+export const deleteMusic = async (id: number) => {
+  return query("DELETE FROM musics WHERE id = $1", [id]);
 };

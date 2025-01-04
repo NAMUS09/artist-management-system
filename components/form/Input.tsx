@@ -46,6 +46,10 @@ const Input: React.FC<InputProps> = ({
               type={type}
               disabled={disabled || form.formState.isSubmitting}
               {...field}
+              value={field.value ?? ""}
+              onChange={(e) => {
+                field.onChange(e);
+              }}
               className={clsx(className, "w-full")}
             />
           </FormControl>

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table";
 import { createContext, use, useState } from "react";
 import { DataTablePagination } from "../table/DataTablePagination";
+import { Skeleton } from "../ui/skeleton";
 
 type PaginationTableContextValue = {
   pagination: PaginationState;
@@ -52,14 +53,32 @@ export const PaginationTable: React.FC<PaginationTableProps> = ({
   );
 };
 
+const LoadingState = ({ columns }: { columns: number }) => {
+  return (
+    <>
+      {[...Array(5)].map((_, index) => (
+        <TableRow key={index}>
+          {[...Array(columns)].map((_, index) => (
+            <TableCell key={index} className="p-2">
+              <Skeleton className="w-full h-[2rem] rounded-xl" />
+            </TableCell>
+          ))}
+        </TableRow>
+      ))}
+    </>
+  );
+};
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  isLoading?: boolean; // Add a prop to indicate loading state
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  isLoading = false, // Default to false if not provided
 }: DataTableProps<TData, TValue>) {
   const paginationContext = use(PaginationTableContext);
 
@@ -77,7 +96,6 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    // getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     rowCount: totalPages || 1,
@@ -112,7 +130,9 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? ( // Conditionally render loading state
+              <LoadingState columns={columns.length} />
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -141,8 +161,8 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className=" mt-2">
-        <DataTablePagination table={table} />
+      <div className="mt-2">
+        <DataTablePagination table={table} isLoading={isLoading} />
       </div>
     </div>
   );

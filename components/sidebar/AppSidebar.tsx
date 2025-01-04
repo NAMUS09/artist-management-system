@@ -1,5 +1,3 @@
-import { ContactRound, Home, LucideIcon, Music, Users } from "lucide-react";
-
 import {
   Sidebar,
   SidebarContent,
@@ -7,18 +5,15 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { getCurrentUser } from "@/lib/auth";
 import { Role } from "@/lib/interface";
-import { headers } from "next/headers";
-import Link from "next/link";
+import SidebarLink from "./SidebarLink";
 
 type RouteType = {
   title: string;
   url: string;
-  icon: LucideIcon;
+  icon: string; // Pass icon name as a string
   roles: Role[];
 };
 
@@ -27,32 +22,30 @@ export const routes: RouteType[] = [
   {
     title: "Home",
     url: "/",
-    icon: Home,
+    icon: "Home",
     roles: ["super_admin"],
   },
   {
     title: "Users",
     url: "/users",
-    icon: Users,
+    icon: "Users",
     roles: ["super_admin"],
   },
   {
     title: "Artists",
     url: "/artists",
-    icon: ContactRound,
+    icon: "ContactRound",
     roles: ["super_admin", "artist_manager"],
   },
   {
     title: "Musics",
     url: "/musics",
-    icon: Music,
+    icon: "Music",
     roles: ["super_admin", "artist_manager", "artist"],
   },
 ];
 
 const AppSidebar = async () => {
-  const headerList = await headers();
-  const pathname = headerList.get("x-current-path");
   const currentUser = await getCurrentUser();
   const role = currentUser?.role;
 
@@ -69,14 +62,12 @@ const AppSidebar = async () => {
           <SidebarGroupContent>
             <SidebarMenu>
               {filteredItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <Link href={item.url}>
-                    <SidebarMenuButton isActive={item.url === pathname}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </SidebarMenuButton>
-                  </Link>
-                </SidebarMenuItem>
+                <SidebarLink
+                  key={item.url}
+                  title={item.title}
+                  url={item.url}
+                  icon={item.icon} // Pass icon name
+                />
               ))}
             </SidebarMenu>
           </SidebarGroupContent>

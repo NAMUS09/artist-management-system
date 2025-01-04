@@ -5,7 +5,7 @@ interface ArtistWithId extends Artist {
   id: number;
 }
 
-export const getArtistById = async (id: string) => {
+export const getArtistById = async (id: number) => {
   const rows = await query("SELECT * FROM artists WHERE id = $1", [id]);
   return rows[0];
 };
@@ -82,4 +82,8 @@ export const updateArtist = async (id: number, artist: Artist) => {
   );
 
   return rows;
+};
+
+export const deleteArtist = async (id: number) => {
+  return query("DELETE FROM artists WHERE id = $1", [id]);
 };

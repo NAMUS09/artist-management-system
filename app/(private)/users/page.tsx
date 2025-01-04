@@ -10,6 +10,7 @@ import {
   createMultipleUserSchema,
 } from "@/app/schemas/userSchema";
 
+import DeleteAlert from "@/components/DeleteAlert";
 import { PaginationTable } from "@/components/table/data-table";
 import TableLayout from "@/components/TableLayout";
 import {
@@ -84,6 +85,7 @@ const UsersPage = () => {
 
   const [user, setUser] = useState<User | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [deleteAlert, setDeleteAlert] = useState(false);
 
   const { data, isLoading } = useQuery<UsersResponse>({
     queryKey: ["users", pagination],
@@ -123,9 +125,33 @@ const UsersPage = () => {
     },
   });
 
+  // delete artist
+  const { mutate: deleteMutate } = useMutation<
+    BaseResponse,
+    AxiosError<BaseErrorResponse>,
+    number
+  >({
+    mutationFn: (id) =>
+      axiosClient.delete(`/user/${id}`).then((res) => res.data),
+    onSuccess: (res) => {
+      if (res.success) {
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
+      }
+    },
+    onError: (error) => {
+      console.log(error.message);
+      toast.error(error.response?.data.message || "Failed to delete user");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+  });
+
   const handleAdd = () => {
-    setIsOpen(true);
     setUser(null);
+    setIsOpen(true);
   };
 
   const handleEdit = (user: User) => {
@@ -134,7 +160,14 @@ const UsersPage = () => {
   };
 
   const handleDelete = (user: User) => {
-    console.log(user);
+    setUser(user);
+    setDeleteAlert(true);
+  };
+
+  const onDeleteUser = () => {
+    if (user) {
+      deleteMutate(user.id!);
+    }
   };
 
   const importUsers = (users: { [key: string]: string }[]) => {
@@ -171,6 +204,11 @@ const UsersPage = () => {
           setOpen={setIsOpen}
           user={user}
           setUser={setUser}
+        />
+        <DeleteAlert
+          isOpen={deleteAlert}
+          onOpenChange={setDeleteAlert}
+          onDelete={onDeleteUser}
         />
       </TableLayout>
     </PaginationTable>

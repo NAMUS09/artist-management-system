@@ -14,14 +14,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Skeleton } from "../ui/skeleton";
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
+  isLoading?: boolean;
 }
 
 export function DataTablePagination<TData>({
   table,
+  isLoading,
 }: DataTablePaginationProps<TData>) {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-end">
+        <div className="flex gap-10">
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-8 w-28" />
+          <Skeleton className="h-8 w-48" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">

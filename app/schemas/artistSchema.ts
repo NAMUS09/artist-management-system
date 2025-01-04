@@ -1,9 +1,10 @@
 import { z } from "zod";
-import { dobApiSchema, genderSchema } from "./common";
+import { dobApiSchema, dobSchema, genderSchema } from "./common";
 
 export const createArtistSchema = z.object({
+  id: z.number().optional(),
   name: z.string().nonempty({ message: "Name is required" }),
-  dob: dobApiSchema,
+  dob: z.union([dobApiSchema, dobSchema]),
   gender: genderSchema,
   address: z.string(),
   first_release_year: z

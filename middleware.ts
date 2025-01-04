@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { routes } from "./components/AppSidebar";
+import { routes } from "./components/sidebar/AppSidebar";
 import { getCurrentUser } from "./lib/auth";
 
 const PUBLIC_ROUTES = ["/login", "/register"];
@@ -7,9 +7,6 @@ const PUBLIC_ROUTES = ["/login", "/register"];
 const PRIVATE_API_ROUTES = ["/api/user", "/api/artist", "/api/music"];
 
 export async function middleware(req: NextRequest) {
-  const headers = new Headers(req.headers);
-  headers.set("x-current-path", req.nextUrl.pathname);
-
   const currentUser = await getCurrentUser();
   const { pathname } = req.nextUrl;
 
@@ -51,7 +48,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL(validRoutesForUser[0].url, req.url));
   }
 
-  return NextResponse.next({ headers });
+  return NextResponse.next();
 }
 
 export const config = {
