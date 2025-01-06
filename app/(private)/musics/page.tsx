@@ -129,6 +129,7 @@ const MusicsPage = () => {
 
   const handleDelete = (music: Music) => {
     setMusic(music);
+    setDeleteAlert(true);
   };
 
   const onDeleteMusic = () => {
